@@ -17,7 +17,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <color key="sectionIndexBackgroundColor" systemColor="secondarySystemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="TaskListCell" id="ix5-KS-RLd" customClass="TaskViewCell" customModule="ToDoList" customModuleProvider="target">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="taskListCell" id="ix5-KS-RLd" customClass="TaskViewCell" customModule="ToDoList" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="50" width="375" height="43"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ix5-KS-RLd" id="6Wp-We-Bhy">
@@ -63,7 +63,7 @@
                             <outlet property="delegate" destination="QVE-mu-63t" id="nf7-15-lVA"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="To-Do List" largeTitleDisplayMode="always" id="ZbP-jz-VRt"/>
+                    <navigationItem key="navigationItem" title="To-Do List" id="ZbP-jz-VRt"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D6y-Y6-PTb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -74,10 +74,13 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="IRQ-Y0-AHW" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" largeTitles="YES" id="CwB-FD-vSN">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="96"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="CwB-FD-vSN">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" red="0.32665712669215546" green="0.95767557989690721" blue="0.79594848606390167" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <textAttributes key="titleTextAttributes">
+                            <color key="textColor" red="0.39449707446619392" green="0.0" blue="0.65301324903350522" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        </textAttributes>
                         <textAttributes key="largeTitleTextAttributes">
                             <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                             <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
