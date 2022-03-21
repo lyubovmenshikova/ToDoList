@@ -16,7 +16,7 @@ class TaskListController: UITableViewController {
         super.viewDidLoad()
         //self.navigationController!.view.backgroundColor = UIColor.clear
         navigationItem.leftBarButtonItem = editButtonItem
-        //navigationItem.rightBarButtonItem =
+        navigationItem.rightBarButtonItem = getAddButton()
     }
 
     // MARK: - Table view data source
@@ -81,5 +81,28 @@ class TaskListController: UITableViewController {
         header.textLabel?.textColor = .black
     }
     
+    private func getAddButton() -> UIBarButtonItem {
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add,
+                                        target: self,
+                                        action: #selector(addButtonPressed))
+        return addButton
+    }
+    
+    @objc private func addButtonPressed() {
+        performSegue(withIdentifier: "toTask", sender: nil)
+    }
+    
+    override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        let taskType = sectionsTypesPositions[indexPath.section]
+        guard let _ = tasks[taskType]?[indexPath.row] else { return }
+        guard tasks[taskType]![indexPath.row].status == .planned else {
+            tableView.deselectRow(at: indexPath, animated: true)
+            return
+        }
+        //ставим задачу как выполненную
+        tasks[taskType]![indexPath.row].status = .completed
+        //перезагружаем таблицу
+        tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
+    }
 
 }
