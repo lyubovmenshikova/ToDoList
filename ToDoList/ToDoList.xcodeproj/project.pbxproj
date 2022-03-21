@@ -18,6 +18,8 @@
 		9F4551CE27E7467E00836030 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4551CD27E7467E00836030 /* Task.swift */; };
 		9F4551D027E87C9200836030 /* TaskEditController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4551CF27E87C9200836030 /* TaskEditController.swift */; };
 		9F4551D227E8A35F00836030 /* TaskTypeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4551D127E8A35F00836030 /* TaskTypeController.swift */; };
+		9F4551D527E8AB0700836030 /* TaskTypeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4551D327E8AB0700836030 /* TaskTypeCell.swift */; };
+		9F4551D627E8AB0700836030 /* TaskTypeCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9F4551D427E8AB0700836030 /* TaskTypeCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,8 @@
 		9F4551CD27E7467E00836030 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		9F4551CF27E87C9200836030 /* TaskEditController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEditController.swift; sourceTree = "<group>"; };
 		9F4551D127E8A35F00836030 /* TaskTypeController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTypeController.swift; sourceTree = "<group>"; };
+		9F4551D327E8AB0700836030 /* TaskTypeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTypeCell.swift; sourceTree = "<group>"; };
+		9F4551D427E8AB0700836030 /* TaskTypeCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TaskTypeCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,6 +130,8 @@
 			isa = PBXGroup;
 			children = (
 				9F4551CA27E4C61300836030 /* TaskViewCell.swift */,
+				9F4551D327E8AB0700836030 /* TaskTypeCell.swift */,
+				9F4551D427E8AB0700836030 /* TaskTypeCell.xib */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -198,6 +204,7 @@
 			files = (
 				9F4551B927E4B5D600836030 /* LaunchScreen.storyboard in Resources */,
 				9F4551B627E4B5D600836030 /* Assets.xcassets in Resources */,
+				9F4551D627E8AB0700836030 /* TaskTypeCell.xib in Resources */,
 				9F4551B127E4B5D500836030 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -217,6 +224,7 @@
 				9F4551CE27E7467E00836030 /* Task.swift in Sources */,
 				9F4551B427E4B5D500836030 /* ToDoList.xcdatamodeld in Sources */,
 				9F4551D027E87C9200836030 /* TaskEditController.swift in Sources */,
+				9F4551D527E8AB0700836030 /* TaskTypeCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

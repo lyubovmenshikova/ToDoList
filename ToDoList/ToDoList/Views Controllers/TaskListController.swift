@@ -92,7 +92,8 @@ class TaskListController: UITableViewController {
         performSegue(withIdentifier: "toTask", sender: nil)
     }
     
-    override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let taskType = sectionsTypesPositions[indexPath.section]
         guard let _ = tasks[taskType]?[indexPath.row] else { return }
         guard tasks[taskType]![indexPath.row].status == .planned else {
