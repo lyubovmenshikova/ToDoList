@@ -17,6 +17,8 @@ class TaskEditController: UITableViewController {
     var taskType: TaskPriority = .normal
     var taskStatus: TaskStatus = .planned
     
+    var doAfterEdit: ((String, TaskPriority, TaskStatus) -> Void)?
+    
     private var taskTitles: [TaskPriority: String] = [
         .important: "Важная",
         .normal: "Текущая"
@@ -31,6 +33,26 @@ class TaskEditController: UITableViewController {
             taskStatusSwitch.isOn = true
         }
     }
+    
+    @IBAction func saveTaskButtonPressed(_ sender: UIBarButtonItem) {
+        let title = taskTitle?.text ?? ""
+        if title.first == " " || title.last == " " {
+            showAlert()
+            return
+        }
+        let type = taskType
+        let status: TaskStatus = taskStatusSwitch.isOn ? .completed : .planned
+        doAfterEdit?(title,type,status)
+        navigationController?.popViewController(animated: true)
+    }
+    
+    private func showAlert() {
+        let alertController = UIAlertController(title: "Ошибка", message: "Поле должно быть заполнено", preferredStyle: .alert)
+        let okButton = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        alertController.addAction(okButton)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
 
     // MARK: - Table view data source
 
@@ -44,7 +66,7 @@ class TaskEditController: UITableViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "toTaskType" {
-            let dVC = segue.destination as! TaskTypeController
+            guard let dVC = segue.destination as? TaskTypeController else { return }
             dVC.selectedType = taskType
             dVC.doAfterSelect = { [unowned self] selectedType in
                 self.taskType = selectedType

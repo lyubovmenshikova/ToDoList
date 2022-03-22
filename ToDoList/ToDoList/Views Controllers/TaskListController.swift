@@ -9,14 +9,17 @@ import UIKit
 
 class TaskListController: UITableViewController {
     
+    
     var tasks: [TaskPriority: [TaskProtocol]] = [.normal:[Task(title: "Hello", type: .normal, status: .planned), Task(title: "Bye", type: .normal, status: .completed)], .important:[Task(title: "iii", type: .normal, status: .planned)]]
     var sectionsTypesPositions: [TaskPriority] = [.important, .normal]
     
+   
     override func viewDidLoad() {
         super.viewDidLoad()
-        //self.navigationController!.view.backgroundColor = UIColor.clear
         navigationItem.leftBarButtonItem = editButtonItem
         navigationItem.rightBarButtonItem = getAddButton()
+        
+        setupStatusBar()
     }
 
     // MARK: - Table view data source
@@ -92,6 +95,16 @@ class TaskListController: UITableViewController {
         performSegue(withIdentifier: "toTask", sender: nil)
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let dVC = segue.destination as? TaskEditController else { return }
+        dVC.doAfterEdit = { [unowned self] title, type, status in
+            let newTask = Task(title: title, type: type, status: status)
+            self.tasks[type]?.append(newTask)
+            self.tableView.reloadData()
+        }
+        
+    }
+    
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let taskType = sectionsTypesPositions[indexPath.section]
@@ -105,5 +118,19 @@ class TaskListController: UITableViewController {
         //перезагружаем таблицу
         tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
     }
+    
+    
+    private func setupStatusBar() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(red: 34/255, green: 191/255, blue: 181/255, alpha: 1)
+        appearance.titleTextAttributes = [.font: UIFont.boldSystemFont(ofSize: 21.0),
+                                          .foregroundColor: UIColor.white]
+        
+        navigationController?.navigationBar.tintColor = .white
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+    }
+
 
 }
