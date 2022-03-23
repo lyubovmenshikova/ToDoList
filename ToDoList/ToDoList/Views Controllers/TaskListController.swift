@@ -10,9 +10,14 @@ import UIKit
 class TaskListController: UITableViewController {
     
     
-    var tasks: [TaskPriority: [TaskProtocol]] = [.normal:[Task(title: "Hello", type: .normal, status: .planned), Task(title: "Bye", type: .normal, status: .completed)], .important:[Task(title: "iii", type: .normal, status: .planned)]]
+    var tasks: [TaskPriority: [TaskProtocol]] = [.normal:[Task(title: "Normal", type: .normal, status: .planned)], .important:[Task(title: "Important", type: .important, status: .planned)]]
+    
     var sectionsTypesPositions: [TaskPriority] = [.important, .normal]
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        tableView.reloadData()
+    }
    
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -99,6 +104,7 @@ class TaskListController: UITableViewController {
         guard let dVC = segue.destination as? TaskEditController else { return }
         dVC.doAfterEdit = { [unowned self] title, type, status in
             let newTask = Task(title: title, type: type, status: status)
+            
             self.tasks[type]?.append(newTask)
             self.tableView.reloadData()
         }
@@ -130,6 +136,63 @@ class TaskListController: UITableViewController {
         navigationController?.navigationBar.tintColor = .white
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
+    }
+    
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let taskType = sectionsTypesPositions[indexPath.section]
+        guard let _ = tasks[taskType] else { return nil }
+        
+        //действие изменения статуса на "запланирована"
+        let actionSwipeInstance = UIContextualAction(style: .normal, title: "Не выполнена") { _, _, _ in
+            self.tasks[taskType]![indexPath.row].status = .planned
+            self.tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
+        }
+        
+        //действие для перехода к экрану редактирования
+        let actionEditInstance = UIContextualAction(style: .normal, title: "Редактировать", handler: { _, _, _ in
+            let editScreen = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TaskEditController") as! TaskEditController
+            editScreen.taskText = self.tasks[taskType]![indexPath.row].title
+            editScreen.taskType = self.tasks[taskType]![indexPath.row].type
+            editScreen.taskStatus = self.tasks[taskType]![indexPath.row].status
+            editScreen.doAfterEdit = { [unowned self] title, type, status in
+                let editedTask = Task(title: title, type: type, status: status)
+                self.tasks[type]?.append(editedTask)
+                tasks[taskType]?.remove(at: indexPath.row)
+                self.tableView.reloadData()
+            }
+            self.navigationController?.pushViewController(editScreen, animated: true)
+        })
+        
+        actionEditInstance.backgroundColor = .orange
+        
+        // добавляем доступные действия в массив
+        if tasks[taskType]![indexPath.row].status == .completed {
+            return UISwipeActionsConfiguration(actions: [actionEditInstance,actionSwipeInstance])
+        } else {
+            return UISwipeActionsConfiguration(actions: [actionEditInstance])
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        let taskType = sectionsTypesPositions[indexPath.section]
+        tasks[taskType]?.remove(at: indexPath.row)
+        //удаляем строку соответствующую задаче в таблице
+        tableView.deleteRows(at: [indexPath], with: .automatic)
+    }
+    
+    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let taskTypeFrom = sectionsTypesPositions[sourceIndexPath.section]
+        let taskTypeTo = sectionsTypesPositions[destinationIndexPath.section]
+        
+        guard let movedTask = tasks[taskTypeFrom]?[sourceIndexPath.row] else { return }
+        
+        tasks[taskTypeFrom]!.remove(at: sourceIndexPath.row)
+        tasks[taskTypeTo]!.insert(movedTask, at: destinationIndexPath.row)
+        
+        if taskTypeFrom != taskTypeTo {
+            tasks[taskTypeTo]![destinationIndexPath.row].type = taskTypeTo
+        }
+        tableView.reloadData()
     }
 
 

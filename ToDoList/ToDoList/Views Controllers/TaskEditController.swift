@@ -24,8 +24,10 @@ class TaskEditController: UITableViewController {
         .normal: "Текущая"
     ]
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        taskTitle?.text = taskText
         taskTypeLabel?.text = taskTitles[taskType]
         
         //switch
@@ -36,7 +38,7 @@ class TaskEditController: UITableViewController {
     
     @IBAction func saveTaskButtonPressed(_ sender: UIBarButtonItem) {
         let title = taskTitle?.text ?? ""
-        if title.first == " " || title.last == " " {
+        if title == "" || title.first == " " {
             showAlert()
             return
         }
@@ -47,7 +49,7 @@ class TaskEditController: UITableViewController {
     }
     
     private func showAlert() {
-        let alertController = UIAlertController(title: "Ошибка", message: "Поле должно быть заполнено", preferredStyle: .alert)
+        let alertController = UIAlertController(title: "Ошибка", message: "Поле \("'Введите задачу'") должно быть заполнено", preferredStyle: .alert)
         let okButton = UIAlertAction(title: "OK", style: .cancel, handler: nil)
         alertController.addAction(okButton)
         self.present(alertController, animated: true, completion: nil)
