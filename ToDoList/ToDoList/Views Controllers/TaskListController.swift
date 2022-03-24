@@ -18,7 +18,7 @@ class TaskListController: UITableViewController {
         super.viewWillAppear(true)
         tableView.reloadData()
     }
-   
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.leftBarButtonItem = editButtonItem
@@ -26,19 +26,19 @@ class TaskListController: UITableViewController {
         
         setupStatusBar()
     }
-
+    
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         return tasks.count
     }
-
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let taskType = sectionsTypesPositions[section]
         guard let taskArray = tasks[taskType] else { return 0 }
         return taskArray.count
     }
-
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "taskListCell", for: indexPath) as! TaskViewCell
         let taskType = sectionsTypesPositions[indexPath.section]
@@ -47,6 +47,11 @@ class TaskListController: UITableViewController {
         cell.titleLabel.text = currentTask.title
         cell.symbolLabel.text = getSymbolForTask(with: currentTask.status)
         
+        
+        let labelTap = UITapGestureRecognizer(target: self, action: #selector(labelTapped))
+        cell.symbolLabel.isUserInteractionEnabled = true
+        cell.symbolLabel.addGestureRecognizer(labelTap)
+        
         // изменяем цвет текста
         if currentTask.status == .planned {
             cell.titleLabel.textColor = .black
@@ -54,9 +59,33 @@ class TaskListController: UITableViewController {
         } else {
             cell.titleLabel.textColor = .lightGray
         }
-       
+        
         return cell
     }
+    
+    @objc func labelTapped(_ sender: UIGestureRecognizer) {
+        let position = sender.location(in: self.tableView)
+        guard let index = self.tableView.indexPathForRow(at: position) else {
+            print("Error label not in tableView")
+            return
+        }
+        
+        self.tableView.beginUpdates()
+        defer { self.tableView.endUpdates() }
+        
+        let taskType = sectionsTypesPositions[index.section]
+        guard let _ = tasks[taskType]?[index.row] else { return }
+        
+        if tasks[taskType]?[index.row].status == .planned {
+            tasks[taskType]?[index.row].status = .completed
+        } else {
+            tasks[taskType]?[index.row].status = .planned
+        }
+        self.tableView.reloadRows(at: [index], with: .automatic)
+        
+    }
+    
+    
     
     //символ для задачи
     private func getSymbolForTask(with status: TaskStatus) -> String {
@@ -113,16 +142,8 @@ class TaskListController: UITableViewController {
     
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let taskType = sectionsTypesPositions[indexPath.section]
-        guard let _ = tasks[taskType]?[indexPath.row] else { return }
-        guard tasks[taskType]![indexPath.row].status == .planned else {
-            tableView.deselectRow(at: indexPath, animated: true)
-            return
-        }
-        //ставим задачу как выполненную
-        tasks[taskType]![indexPath.row].status = .completed
-        //перезагружаем таблицу
-        tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
+        guard let cell = tableView.cellForRow(at: indexPath) else { return }
+        cell.setSelected(false, animated: true)
     }
     
     
@@ -142,12 +163,6 @@ class TaskListController: UITableViewController {
         let taskType = sectionsTypesPositions[indexPath.section]
         guard let _ = tasks[taskType] else { return nil }
         
-        //действие изменения статуса на "запланирована"
-        let actionSwipeInstance = UIContextualAction(style: .normal, title: "Не выполнена") { _, _, _ in
-            self.tasks[taskType]![indexPath.row].status = .planned
-            self.tableView.reloadSections(IndexSet(arrayLiteral: indexPath.section), with: .automatic)
-        }
-        
         //действие для перехода к экрану редактирования
         let actionEditInstance = UIContextualAction(style: .normal, title: "Редактировать", handler: { _, _, _ in
             let editScreen = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TaskEditController") as! TaskEditController
@@ -166,11 +181,8 @@ class TaskListController: UITableViewController {
         actionEditInstance.backgroundColor = .orange
         
         // добавляем доступные действия в массив
-        if tasks[taskType]![indexPath.row].status == .completed {
-            return UISwipeActionsConfiguration(actions: [actionEditInstance,actionSwipeInstance])
-        } else {
-            return UISwipeActionsConfiguration(actions: [actionEditInstance])
-        }
+        return UISwipeActionsConfiguration(actions: [actionEditInstance])
+        
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -194,6 +206,5 @@ class TaskListController: UITableViewController {
         }
         tableView.reloadData()
     }
-
-
+    
 }

@@ -11,4 +11,5 @@ class TaskViewCell: UITableViewCell {
 
     @IBOutlet var symbolLabel: UILabel!
     @IBOutlet var titleLabel: UILabel!
+    
 }
