@@ -99,6 +99,13 @@ class ListViewController: UITableViewController {
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
     }
     
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let indexPath = tableView.indexPathForSelectedRow else { return }
+        let destinationVC = segue.destination as! TaskListController
+        destinationVC.taskList = lists[indexPath.row]
+    }
+    
 }
 
 extension ListViewController {

@@ -11,8 +11,8 @@ class TaskListController: UITableViewController {
     
     
     var tasks: [TaskPriority: [TaskProtocol]] = [:]
-    
     var sectionsTypesPositions: [TaskPriority] = [.important, .normal]
+    var taskList: TaskListProtocol!
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
@@ -21,7 +21,14 @@ class TaskListController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = taskList.name
         loadTasks()
+//        var currentTask = taskList.tasks.filter { task in
+//            task.status == .planned
+//        }
+//        var completedTask = taskList.tasks.filter { task in
+//            task.status == .completed
+//        }
         navigationItem.rightBarButtonItems = [getAddButton(), editButtonItem]
     }
     
