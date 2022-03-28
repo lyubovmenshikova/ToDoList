@@ -30,3 +30,16 @@ enum TaskStatus: Int {
     case planned
     case completed
 }
+
+
+protocol TaskListProtocol {
+    var name: String { get set }
+    var date: Date { get set }
+    var tasks: [TaskProtocol] { get set }
+}
+
+struct TaskList: TaskListProtocol {
+    var name: String
+    var date: Date
+    var tasks: [TaskProtocol]
+}

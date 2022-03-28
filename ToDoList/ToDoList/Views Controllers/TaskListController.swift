@@ -10,7 +10,7 @@ import UIKit
 class TaskListController: UITableViewController {
     
     
-    var tasks: [TaskPriority: [TaskProtocol]] = [.normal:[Task(title: "Normal", type: .normal, status: .planned)], .important:[Task(title: "Important", type: .important, status: .planned)]]
+    var tasks: [TaskPriority: [TaskProtocol]] = [:]
     
     var sectionsTypesPositions: [TaskPriority] = [.important, .normal]
     
@@ -21,10 +21,19 @@ class TaskListController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.leftBarButtonItem = editButtonItem
-        navigationItem.rightBarButtonItem = getAddButton()
+        loadTasks()
+        navigationItem.rightBarButtonItems = [getAddButton(), editButtonItem]
+    }
+    
+    private func loadTasks() {
+        sectionsTypesPositions.forEach { taskType in
+            tasks[taskType] = []
+        }
         
-        setupStatusBar()
+//        tasksStorage.loadTask().forEach { task in
+//            // в словаре по ключу task.type заполняем массив ЗНАЧЕНИЙ  нужными данными
+//            tasks[task.type]?.append(task)
+//        }
     }
     
     // MARK: - Table view data source
@@ -130,14 +139,15 @@ class TaskListController: UITableViewController {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let dVC = segue.destination as? TaskEditController else { return }
-        dVC.doAfterEdit = { [unowned self] title, type, status in
-            let newTask = Task(title: title, type: type, status: status)
-            
-            self.tasks[type]?.append(newTask)
-            self.tableView.reloadData()
+        if segue.identifier == "toTask" {
+            guard let dVC = segue.destination as? TaskEditController else { return }
+            dVC.doAfterEdit = { [unowned self] title, type, status in
+                let newTask = Task(title: title, type: type, status: status)
+                
+                self.tasks[type]?.append(newTask)
+                self.tableView.reloadData()
+            }
         }
-        
     }
     
     
@@ -146,18 +156,6 @@ class TaskListController: UITableViewController {
         cell.setSelected(false, animated: true)
     }
     
-    
-    private func setupStatusBar() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(red: 34/255, green: 191/255, blue: 181/255, alpha: 1)
-        appearance.titleTextAttributes = [.font: UIFont.boldSystemFont(ofSize: 21.0),
-                                          .foregroundColor: UIColor.white]
-        
-        navigationController?.navigationBar.tintColor = .white
-        navigationController?.navigationBar.standardAppearance = appearance
-        navigationController?.navigationBar.scrollEdgeAppearance = appearance
-    }
     
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let taskType = sectionsTypesPositions[indexPath.section]
