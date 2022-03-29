@@ -10,7 +10,7 @@ import RealmSwift
 
 
 class Task: Object {
-    @objc dynamic var title: String = ""
+    @Persisted var title: String = ""
     
     @objc dynamic var type = TaskPriority.important.rawValue
     var priorityEnum: TaskPriority {
@@ -25,12 +25,12 @@ class Task: Object {
     }
 }
 
-enum TaskPriority: String {
+enum TaskPriority: String, PersistableEnum {
     case important
     case normal
 }
 
-enum TaskStatus: String {
+enum TaskStatus: String, PersistableEnum {
     case planned
     case completed
 }

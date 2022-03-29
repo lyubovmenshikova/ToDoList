@@ -15,6 +15,9 @@ class TaskListController: UITableViewController {
     var sectionsTypesPositions: [TaskPriority] = [.important, .normal]
     var taskList: TaskList!
     
+    var currentTask: Results<Task>!
+    var importantTask: Results<Task>!
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         tableView.reloadData()
@@ -24,7 +27,9 @@ class TaskListController: UITableViewController {
         super.viewDidLoad()
         title = taskList.name
         loadTasks()
-//        var currentTask = taskList.tasks.filter { task in
+        //currentTask = taskList.tasks.
+        
+//        taskList.tasks.filter { task in
 //            task.status == .planned
 //        }
 //        var completedTask = taskList.tasks.filter { task in
