@@ -6,10 +6,11 @@
 //
 
 import UIKit
+import RealmSwift
 
 class ListViewController: UITableViewController {
     
-    var lists: [TaskListProtocol] = []
+    var lists: Results<TaskList>!
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -18,6 +19,7 @@ class ListViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        lists = StorageManager.shared.realm.objects(TaskList.self)
         setupStatusBar()
     }
     
@@ -36,24 +38,24 @@ class ListViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ListCell", for: indexPath) as! ListViewCell
         let taskList = lists[indexPath.row]
         
-        let currentTask = taskList.tasks.filter { task in
-            task.status == .planned
-        }
-        let comletedTask = taskList.tasks.filter { task in
-            task.status == .completed
-        }
-        
+//        let currentTask = taskList.tasks.filter { task in
+//            task.status == .planned
+//        }
+//        let comletedTask = taskList.tasks.filter { task in
+//            task.status == .completed
+//        }
+//
         cell.titleLabel.text = taskList.name
-        
-        if !currentTask.isEmpty {
-            cell.detailLabel.text = "\(currentTask.count)"
-            cell.accessoryType = .none
-        } else if !comletedTask.isEmpty {
-            cell.accessoryType = .checkmark
-        } else {
-            cell.accessoryType = .none
-            cell.detailLabel.text = "0"
-        }
+//
+//        if !currentTask.isEmpty {
+//            cell.detailLabel.text = "\(currentTask.count)"
+//            cell.accessoryType = .none
+//        } else if !comletedTask.isEmpty {
+//            cell.accessoryType = .checkmark
+//        } else {
+//            cell.accessoryType = .none
+//            cell.detailLabel.text = "0"
+//        }
         
         return cell
     }
@@ -63,24 +65,23 @@ class ListViewController: UITableViewController {
 
         let deleteAction = UIContextualAction(style: .destructive, title: "Удалить") { _, _, _ in
            // удалить из хранилища
-            self.lists.remove(at: indexPath.row)
+            StorageManager.shared.delete(taskList: taskList)
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
 
         let editAction = UIContextualAction(style: .normal, title: "Изменить") { (_, _, isDone) in
-            self.showALert(withTitle: "Редактировать список", message: "Введите новое значение", taskList: taskList)
-//            self.showALert(taskList: taskList) {
-//                tableView.reloadRows(at: [indexPath], with: .automatic)
-//            }
+            self.showALert(withTitle: "Редактировать список", message: "Введите новое значение", taskList: taskList) {
+                tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
             isDone(true)
         }
-//
+        editAction.backgroundColor = .orange
+
 //        let doneAction = UIContextualAction(style: .normal, title: "Ок") { _, _, isDone in
 //            taskList.tasks[indexPath.row].status = .completed
 //            tableView.reloadRows(at: [indexPath], with: .automatic)
 //            isDone(true)
 //        }
-//        editAction.backgroundColor = .orange
 //        doneAction.backgroundColor = .green
 
         return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
@@ -110,21 +111,25 @@ class ListViewController: UITableViewController {
 
 extension ListViewController {
     
-    private func showALert(withTitle: String, message: String, taskList: TaskListProtocol?) {
-        
+    private func showALert(withTitle: String, message: String, taskList: TaskList?, completion: (() -> Void)? = nil) {
         let alert = UIAlertController(title: withTitle, message: message, preferredStyle: .alert)
         
         if let taskList = taskList {
             let saveAction = UIAlertAction(title: "Изменить", style: .destructive) { _ in
-                //taskList.name = alert.textFields?.first?.text
+                guard let newValue = alert.textFields?.first?.text else { return }
+                StorageManager.shared.edit(taskList: taskList, newValue: newValue)
+                completion?()
             }
             alert.addAction(saveAction)
         } else {
             let editAction = UIAlertAction(title: "Сохранить", style: .destructive) { _ in
                 guard let task = alert.textFields?.first?.text else { return }
-                let newTaskList = TaskList(name: task, date: .now, tasks: [])
-                self.lists.append(newTaskList)
-                self.tableView.reloadData()
+                let taskList = TaskList()
+                taskList.name = task
+                StorageManager.shared.save(taskList: taskList)
+            
+                let rowIndex = IndexPath(row: self.lists.count - 1, section: 0)
+                self.tableView.insertRows(at: [rowIndex], with: .automatic)
             }
             alert.addAction(editAction)
         }
@@ -139,32 +144,6 @@ extension ListViewController {
         
         present(alert, animated: true, completion: nil)
         
-       
-//        alert.editAction(with: taskList) { [unowned self] newValue in
-//            if let taskList = taskList, let completion = completion {
-//                taskList.name = newValue
-//                let editTask = TaskList(name: newValue, date: .now, tasks: [])
-//                lists.insert(editTask, at: 0)
-//                let rowIndex = IndexPath(row: self.lists.count - 1, section: 0)
-//                self.tableView.insertRows(at: [rowIndex], with: .automatic)
-//               // taskList.name = newValue
-//                // редактирование StorageManager.shared.edit(taskList: taskList, newValue: newValue)
-//                completion()
-//            } else {
-//                //создаем новый список
-//
-//                let taskList = TaskList(name: newValue, date: .now, tasks: [])
-//                self.lists.append(taskList)
-//                //сохраняем список в базу данных
-//                // StorageManager.shared.save(taskList: taskList)
-//
-//                let rowIndex = IndexPath(row: self.lists.count - 1, section: 0)
-//                //вставляем новый список в табицу по индексу
-//                self.tableView.insertRows(at: [rowIndex], with: .automatic)
-//            }
-//
-//        }
-
     }
     
     

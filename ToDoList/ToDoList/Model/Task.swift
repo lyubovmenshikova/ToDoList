@@ -6,40 +6,38 @@
 //
 
 import Foundation
+import RealmSwift
 
-protocol TaskProtocol {
-    var title: String { get set }
-    var type: TaskPriority { get set }
-    var status: TaskStatus { get set }
+
+class Task: Object {
+    @objc dynamic var title: String = ""
+    
+    @objc dynamic var type = TaskPriority.important.rawValue
+    var priorityEnum: TaskPriority {
+        get { return TaskPriority(rawValue: type)! }
+        set { type = newValue.rawValue }
+    }
+    
+    @objc dynamic var status = TaskStatus.planned.rawValue
+    var statusEnum: TaskStatus {
+        get { return TaskStatus(rawValue: status)! }
+        set { status = newValue.rawValue }
+    }
 }
 
-struct Task: TaskProtocol {
-    var title: String
-    
-    var type: TaskPriority
-    
-    var status: TaskStatus
-}
-
-enum TaskPriority {
+enum TaskPriority: String {
     case important
     case normal
 }
 
-enum TaskStatus: Int {
+enum TaskStatus: String {
     case planned
     case completed
 }
 
 
-protocol TaskListProtocol {
-    var name: String { get set }
-    var date: Date { get set }
-    var tasks: [TaskProtocol] { get set }
-}
-
-struct TaskList: TaskListProtocol {
-    var name: String
-    var date: Date
-    var tasks: [TaskProtocol]
+class TaskList: Object {
+    @objc dynamic var name = ""
+    @objc dynamic var date = Date()
+    let tasks = List<Task>()
 }
