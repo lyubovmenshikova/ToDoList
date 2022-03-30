@@ -11,10 +11,9 @@ import RealmSwift
 class TaskListController: UITableViewController {
     
     
-    var tasks: [TaskPriority: [Task]] = [:]
-    var sectionsTypesPositions: [TaskPriority] = [.important, .normal]
     var taskList: TaskList!
-    
+   
+    var tasks = StorageManager.shared.realm.objects(Task.self)
     var currentTask: Results<Task>!
     var importantTask: Results<Task>!
     
@@ -26,47 +25,37 @@ class TaskListController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = taskList.name
-        loadTasks()
-        //currentTask = taskList.tasks.
         
-//        taskList.tasks.filter { task in
-//            task.status == .planned
-//        }
-//        var completedTask = taskList.tasks.filter { task in
-//            task.status == .completed
-//        }
+        currentTask = taskList.tasks.where({ $0.type == .normal })
+        importantTask = taskList.tasks.where({ $0.type == .important })
+        
         navigationItem.rightBarButtonItems = [getAddButton(), editButtonItem]
     }
     
-    private func loadTasks() {
-        sectionsTypesPositions.forEach { taskType in
-            tasks[taskType] = []
-        }
-        
-        StorageManager.shared.realm.objects(Task.self).forEach { task in
-            tasks[task.priorityEnum]?.append(task)
-        }
-    }
     
     // MARK: - Table view data source
     
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return tasks.count
+        return 2
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        section == 0 ? "ВАЖНЫЕ" : "ТЕКУЩИЕ"
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let taskType = sectionsTypesPositions[section]
-        guard let taskArray = tasks[taskType] else { return 0 }
-        return taskArray.count
+        if tasks.count != 0 {
+            return section == 0 ? importantTask.count : currentTask.count
+        }
+        return 0
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "taskListCell", for: indexPath) as! TaskViewCell
-        let taskType = sectionsTypesPositions[indexPath.section]
-        guard let currentTask = tasks[taskType]?[indexPath.row] else { return cell }
+        let task = indexPath.section == 0 ? importantTask[indexPath.row] : currentTask[indexPath.row]
         
-        cell.titleLabel.text = currentTask.title
-        cell.symbolLabel.text = getSymbolForTask(with: currentTask.statusEnum)
+        cell.titleLabel.text = task.title
+        cell.symbolLabel.text = getSymbolForTask(with: task.status)
         
         
         let labelTap = UITapGestureRecognizer(target: self, action: #selector(labelTapped))
@@ -74,7 +63,7 @@ class TaskListController: UITableViewController {
         cell.symbolLabel.addGestureRecognizer(labelTap)
         
         // изменяем цвет текста
-        if currentTask.statusEnum == .planned {
+        if task.status == .planned {
             cell.titleLabel.textColor = .black
             cell.symbolLabel.textColor = .black
         } else {
@@ -94,15 +83,20 @@ class TaskListController: UITableViewController {
         self.tableView.beginUpdates()
         defer { self.tableView.endUpdates() }
         
-        let taskType = sectionsTypesPositions[index.section]
-        guard let _ = tasks[taskType]?[index.row] else { return }
+        let task = index.section == 0 ? importantTask[index.row] : currentTask[index.row]
         
-        if tasks[taskType]?[index.row].statusEnum == .planned {
-            tasks[taskType]?[index.row].statusEnum = .completed
+        if task.status == .planned {
+            let name = task.title
+            let type = task.type
+            let status = TaskStatus.completed
+            StorageManager.shared.edit(task: task, name: name, type: type, status: status)
         } else {
-            tasks[taskType]?[index.row].statusEnum = .planned
+            let name = task.title
+            let type = task.type
+            let status = TaskStatus.planned
+            StorageManager.shared.edit(task: task, name: name, type: type, status: status)
         }
-        self.tableView.reloadRows(at: [index], with: .automatic)
+        self.tableView.reloadData()
         
     }
     
@@ -121,17 +115,6 @@ class TaskListController: UITableViewController {
         return result
     }
     
-    //заголовок секции
-    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        var title: String?
-        let taskType = sectionsTypesPositions[section]
-        if taskType == .important {
-            title = "ВАЖНЫЕ"
-        } else if taskType == .normal {
-            title = "ТЕКУЩИЕ"
-        }
-        return title
-    }
     
     //цвет текста секции
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
@@ -156,10 +139,10 @@ class TaskListController: UITableViewController {
             dVC.doAfterEdit = { [unowned self] title, type, status in
                 let task = Task()
                 task.title = title
-                task.type = type.rawValue
-                task.status = status.rawValue
-                StorageManager.shared.save(task: task, in: taskList)
-            
+                task.type = type
+                task.status = status
+                StorageManager.shared.save(task: task, in: self.taskList)
+                
                 tableView.reloadData()
             }
         }
@@ -172,22 +155,17 @@ class TaskListController: UITableViewController {
     }
     
     
-    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let taskType = sectionsTypesPositions[indexPath.section]
-        guard let _ = tasks[taskType] else { return nil }
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let task = indexPath.section == 0 ? importantTask[indexPath.row] : currentTask[indexPath.row]
         
         //действие для перехода к экрану редактирования
         let actionEditInstance = UIContextualAction(style: .normal, title: "Редактировать", handler: { _, _, _ in
             let editScreen = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "TaskEditController") as! TaskEditController
-            editScreen.taskText = self.tasks[taskType]![indexPath.row].title
-            editScreen.taskType = self.tasks[taskType]![indexPath.row].priorityEnum
-            editScreen.taskStatus = self.tasks[taskType]![indexPath.row].statusEnum
+            editScreen.taskText = task.title
+            editScreen.taskType = task.type
+            editScreen.taskStatus = task.status
             editScreen.doAfterEdit = { [unowned self] title, type, status in
-                let editedTask = Task()
-                editedTask.title = title
-                editedTask.type = type.rawValue
-                editedTask.status = status.rawValue
-                StorageManager.shared.edit(task: editedTask, name: title)
+                StorageManager.shared.edit(task: task, name: title, type: type, status: status)
                 self.tableView.reloadData()
             }
             self.navigationController?.pushViewController(editScreen, animated: true)
@@ -196,38 +174,31 @@ class TaskListController: UITableViewController {
         let deleteAction = UIContextualAction(style: .destructive, title: "Удалить") { _, _, _ in
             let task = self.taskList.tasks[indexPath.row]
             StorageManager.shared.delete(task: task)
-            self.tasks[taskType]?.remove(at: indexPath.row)
+            // self.tasks[taskType]?.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
         
         actionEditInstance.backgroundColor = .orange
         
         // добавляем доступные действия в массив
-        return UISwipeActionsConfiguration(actions: [actionEditInstance, deleteAction])
-        
+        return UISwipeActionsConfiguration(actions: [deleteAction, actionEditInstance])
     }
     
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        let taskType = sectionsTypesPositions[indexPath.section]
-        guard let task = tasks[taskType]?[indexPath.row] else { return }
-        StorageManager.shared.delete(task: task)
-        tasks[taskType]?.remove(at: indexPath.row)
-        tableView.deleteRows(at: [indexPath], with: .automatic)
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return UITableViewCell.EditingStyle.none
     }
     
-    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        let taskTypeFrom = sectionsTypesPositions[sourceIndexPath.section]
-        let taskTypeTo = sectionsTypesPositions[destinationIndexPath.section]
-        
-        guard let movedTask = tasks[taskTypeFrom]?[sourceIndexPath.row] else { return }
-        
-        tasks[taskTypeFrom]!.remove(at: sourceIndexPath.row)
-        tasks[taskTypeTo]!.insert(movedTask, at: destinationIndexPath.row)
-        
-        if taskTypeFrom != taskTypeTo {
-            tasks[taskTypeTo]![destinationIndexPath.row].type = taskTypeTo.rawValue
-        }
-        tableView.reloadData()
-    }
+    
+//    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+//        
+//        let newTask = Task()
+//        newTask.title = taskList.tasks[sourceIndexPath.row].title
+//        newTask.status = taskList.tasks[sourceIndexPath.row].status
+//        newTask.type = destinationIndexPath.section == 0 ? TaskPriority.important : TaskPriority.normal
+//        
+//        StorageManager.shared.move(task: newTask, in: taskList, indexPathFrom: sourceIndexPath, indexPathTo: destinationIndexPath)
+//        
+//        tableView.reloadData()
+//    }
     
 }

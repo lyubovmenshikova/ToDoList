@@ -47,9 +47,11 @@ class StorageManager {
         }
     }
     
-    func edit(task: Task, name: String) {
+    func edit(task: Task, name: String, type: TaskPriority, status: TaskStatus) {
         write {
             task.title = name
+            task.type = type
+            task.status = status
         }
     }
     
@@ -68,4 +70,13 @@ class StorageManager {
         }
     }
     
+    
+//    func move(task: Task, in taskList: TaskList, indexPathFrom: IndexPath, indexPathTo: IndexPath) {
+//        write {
+//            taskList.tasks.remove(at: indexPathFrom.row)
+//            taskList.tasks.insert(task, at: indexPathTo.row)
+//        }
+//    }
+    
 }
+

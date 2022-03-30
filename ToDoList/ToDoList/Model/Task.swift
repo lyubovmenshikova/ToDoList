@@ -12,17 +12,9 @@ import RealmSwift
 class Task: Object {
     @Persisted var title: String = ""
     
-    @objc dynamic var type = TaskPriority.important.rawValue
-    var priorityEnum: TaskPriority {
-        get { return TaskPriority(rawValue: type)! }
-        set { type = newValue.rawValue }
-    }
+    @Persisted var type = TaskPriority.important
     
-    @objc dynamic var status = TaskStatus.planned.rawValue
-    var statusEnum: TaskStatus {
-        get { return TaskStatus(rawValue: status)! }
-        set { status = newValue.rawValue }
-    }
+    @Persisted var status = TaskStatus.planned
 }
 
 enum TaskPriority: String, PersistableEnum {
@@ -37,7 +29,7 @@ enum TaskStatus: String, PersistableEnum {
 
 
 class TaskList: Object {
-    @objc dynamic var name = ""
-    @objc dynamic var date = Date()
-    let tasks = List<Task>()
+    @Persisted var name = ""
+    @Persisted var date = Date()
+    @Persisted var tasks: List<Task>
 }

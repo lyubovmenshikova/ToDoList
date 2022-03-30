@@ -38,24 +38,21 @@ class ListViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ListCell", for: indexPath) as! ListViewCell
         let taskList = lists[indexPath.row]
         
-//        let currentTask = taskList.tasks.filter { task in
-//            task.status == .planned
-//        }
-//        let comletedTask = taskList.tasks.filter { task in
-//            task.status == .completed
-//        }
-//
+        let currentTask = taskList.tasks.where { $0.status == .planned }
+        let comletedTask = taskList.tasks.where { $0.status == .completed }
+
         cell.titleLabel.text = taskList.name
-//
-//        if !currentTask.isEmpty {
-//            cell.detailLabel.text = "\(currentTask.count)"
-//            cell.accessoryType = .none
-//        } else if !comletedTask.isEmpty {
-//            cell.accessoryType = .checkmark
-//        } else {
-//            cell.accessoryType = .none
-//            cell.detailLabel.text = "0"
-//        }
+
+        if !currentTask.isEmpty {
+            cell.detailLabel.text = "\(currentTask.count)"
+            cell.accessoryType = .none
+        } else if !comletedTask.isEmpty {
+            cell.detailLabel.text = ""
+            cell.accessoryType = .checkmark
+        } else {
+            cell.accessoryType = .none
+            cell.detailLabel.text = "0"
+        }
         
         return cell
     }
@@ -77,8 +74,8 @@ class ListViewController: UITableViewController {
         }
         editAction.backgroundColor = .orange
 
-//        let doneAction = UIContextualAction(style: .normal, title: "Ок") { _, _, isDone in
-//            taskList.tasks[indexPath.row].status = .completed
+//        let doneAction = UIContextualAction(style: .normal, title: "✓") { _, _, isDone in
+//            StorageManager.shared.done(taskList: taskList)
 //            tableView.reloadRows(at: [indexPath], with: .automatic)
 //            isDone(true)
 //        }
