@@ -12,8 +12,6 @@ class TaskListController: UITableViewController {
     
     
     var taskList: TaskList!
-   
-    var tasks = StorageManager.shared.realm.objects(Task.self)
     var currentTask: Results<Task>!
     var importantTask: Results<Task>!
     
@@ -26,9 +24,8 @@ class TaskListController: UITableViewController {
         super.viewDidLoad()
         title = taskList.name
         
-        currentTask = taskList.tasks.where({ $0.type == .normal })
-        importantTask = taskList.tasks.where({ $0.type == .important })
-        
+        currentTask = taskList.tasks.where({ $0.type == .normal }).sorted(byKeyPath: "status", ascending: false)
+        importantTask = taskList.tasks.where({ $0.type == .important }).sorted(byKeyPath: "status", ascending: false)
         navigationItem.rightBarButtonItems = [getAddButton(), editButtonItem]
     }
     
@@ -44,7 +41,7 @@ class TaskListController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if tasks.count != 0 {
+        if taskList.tasks.count != 0 {
             return section == 0 ? importantTask.count : currentTask.count
         }
         return 0
@@ -56,7 +53,6 @@ class TaskListController: UITableViewController {
         
         cell.titleLabel.text = task.title
         cell.symbolLabel.text = getSymbolForTask(with: task.status)
-        
         
         let labelTap = UITapGestureRecognizer(target: self, action: #selector(labelTapped))
         cell.symbolLabel.isUserInteractionEnabled = true
@@ -97,7 +93,6 @@ class TaskListController: UITableViewController {
             StorageManager.shared.edit(task: task, name: name, type: type, status: status)
         }
         self.tableView.reloadData()
-        
     }
     
     
@@ -189,16 +184,14 @@ class TaskListController: UITableViewController {
     }
     
     
-//    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-//        
-//        let newTask = Task()
-//        newTask.title = taskList.tasks[sourceIndexPath.row].title
-//        newTask.status = taskList.tasks[sourceIndexPath.row].status
-//        newTask.type = destinationIndexPath.section == 0 ? TaskPriority.important : TaskPriority.normal
-//        
-//        StorageManager.shared.move(task: newTask, in: taskList, indexPathFrom: sourceIndexPath, indexPathTo: destinationIndexPath)
-//        
-//        tableView.reloadData()
-//    }
+    //    override func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+    //
+    //        let task = sourceIndexPath.section == 0 ? importantTask[sourceIndexPath.row] : currentTask[sourceIndexPath.row]
+    //
+    //        let type = destinationIndexPath.section == 0 ? TaskPriority.important : TaskPriority.normal
+    //
+    //        StorageManager.shared.move(task: task, type: type, taskList: taskList, sourceIndexPath: sourceIndexPath, destinationIndexPath: destinationIndexPath)
+    //        tableView.reloadData()
+    //    }
     
 }

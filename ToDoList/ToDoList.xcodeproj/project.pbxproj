@@ -23,7 +23,6 @@
 		9F93575F27F33E06007B54B5 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 9F93575E27F33E06007B54B5 /* RealmSwift */; };
 		9FED06E227EDA9830098BA93 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FED06E127EDA9830098BA93 /* ListViewController.swift */; };
 		9FED06E427EDD84C0098BA93 /* ListViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FED06E327EDD84C0098BA93 /* ListViewCell.swift */; };
-		9FED06E627EDE5B10098BA93 /* AlertController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FED06E527EDE5B10098BA93 /* AlertController.swift */; };
 		9FED06F527F1EA630098BA93 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FED06F427F1EA630098BA93 /* StorageManager.swift */; };
 /* End PBXBuildFile section */
 
@@ -44,7 +43,6 @@
 		9F4551D427E8AB0700836030 /* TaskTypeCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TaskTypeCell.xib; sourceTree = "<group>"; };
 		9FED06E127EDA9830098BA93 /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 		9FED06E327EDD84C0098BA93 /* ListViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewCell.swift; sourceTree = "<group>"; };
-		9FED06E527EDE5B10098BA93 /* AlertController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertController.swift; sourceTree = "<group>"; };
 		9FED06F427F1EA630098BA93 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -117,7 +115,6 @@
 				9F4551C727E4B81500836030 /* TaskListController.swift */,
 				9F4551CF27E87C9200836030 /* TaskEditController.swift */,
 				9F4551D127E8A35F00836030 /* TaskTypeController.swift */,
-				9FED06E527EDE5B10098BA93 /* AlertController.swift */,
 			);
 			path = "Views Controllers";
 			sourceTree = "<group>";
@@ -249,7 +246,6 @@
 				9F4551AC27E4B5D500836030 /* SceneDelegate.swift in Sources */,
 				9FED06F527F1EA630098BA93 /* StorageManager.swift in Sources */,
 				9F4551CB27E4C61300836030 /* TaskViewCell.swift in Sources */,
-				9FED06E627EDE5B10098BA93 /* AlertController.swift in Sources */,
 				9F4551C827E4B81500836030 /* TaskListController.swift in Sources */,
 				9F4551D227E8A35F00836030 /* TaskTypeController.swift in Sources */,
 				9F4551CE27E7467E00836030 /* Task.swift in Sources */,

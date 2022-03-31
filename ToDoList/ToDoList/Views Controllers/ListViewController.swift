@@ -40,9 +40,9 @@ class ListViewController: UITableViewController {
         
         let currentTask = taskList.tasks.where { $0.status == .planned }
         let comletedTask = taskList.tasks.where { $0.status == .completed }
-
+        
         cell.titleLabel.text = taskList.name
-
+        
         if !currentTask.isEmpty {
             cell.detailLabel.text = "\(currentTask.count)"
             cell.accessoryType = .none
@@ -59,13 +59,13 @@ class ListViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         let taskList = lists[indexPath.row]
-
+        
         let deleteAction = UIContextualAction(style: .destructive, title: "Удалить") { _, _, _ in
-           // удалить из хранилища
+            // удалить из хранилища
             StorageManager.shared.delete(taskList: taskList)
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
-
+        
         let editAction = UIContextualAction(style: .normal, title: "Изменить") { (_, _, isDone) in
             self.showALert(withTitle: "Редактировать список", message: "Введите новое значение", taskList: taskList) {
                 tableView.reloadRows(at: [indexPath], with: .automatic)
@@ -73,15 +73,14 @@ class ListViewController: UITableViewController {
             isDone(true)
         }
         editAction.backgroundColor = .orange
-
-//        let doneAction = UIContextualAction(style: .normal, title: "✓") { _, _, isDone in
-//            StorageManager.shared.done(taskList: taskList)
-//            tableView.reloadRows(at: [indexPath], with: .automatic)
-//            isDone(true)
-//        }
-//        doneAction.backgroundColor = .green
-
+        
         return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        guard let indexPath = tableView.indexPathForSelectedRow else { return }
+        let destinationVC = segue.destination as! TaskListController
+        destinationVC.taskList = lists[indexPath.row]
     }
     
     
@@ -95,13 +94,6 @@ class ListViewController: UITableViewController {
         navigationController?.navigationBar.tintColor = .white
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
-    }
-    
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        guard let indexPath = tableView.indexPathForSelectedRow else { return }
-        let destinationVC = segue.destination as! TaskListController
-        destinationVC.taskList = lists[indexPath.row]
     }
     
 }
@@ -124,7 +116,7 @@ extension ListViewController {
                 let taskList = TaskList()
                 taskList.name = task
                 StorageManager.shared.save(taskList: taskList)
-            
+                
                 let rowIndex = IndexPath(row: self.lists.count - 1, section: 0)
                 self.tableView.insertRows(at: [rowIndex], with: .automatic)
             }

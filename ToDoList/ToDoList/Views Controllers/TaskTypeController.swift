@@ -59,5 +59,4 @@ class TaskTypeController: UITableViewController {
         doAfterSelect?(selectedType)
         navigationController?.popViewController(animated: true)
     }
-
 }

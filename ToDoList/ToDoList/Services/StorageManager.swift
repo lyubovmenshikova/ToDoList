@@ -71,10 +71,12 @@ class StorageManager {
     }
     
     
-//    func move(task: Task, in taskList: TaskList, indexPathFrom: IndexPath, indexPathTo: IndexPath) {
+//    func move(task: Task, type: TaskPriority, taskList: TaskList, sourceIndexPath: IndexPath, destinationIndexPath: IndexPath) {
 //        write {
-//            taskList.tasks.remove(at: indexPathFrom.row)
-//            taskList.tasks.insert(task, at: indexPathTo.row)
+//            task.type = type
+////            taskList.tasks.move(from: sourceIndexPath.row, to: destinationIndexPath.row)
+////            taskList.tasks.remove(at: sourceIndexPath.row)
+////            taskList.tasks.insert(task, at: destinationIndexPath.row)
 //        }
 //    }
     
